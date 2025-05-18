@@ -1,0 +1,73 @@
+# Arquivos de cache e dados gerados
+assets/cache/
+**/lista_processos_*.json
+**/resultados_processos_*.json
+*.pdf
+
+# Arquivos de configuração pessoais
+src/config_local.py
+
+# Ambiente Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Ambientes virtuais
+venv/
+ENV/
+env/
+.env
+.venv
+env.bak/
+venv.bak/
+compilador_juridico/  # Ambiente virtual específico do projeto
+
+# IDEs e editores
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+.classpath
+*.sublime-workspace
+*.sublime-project
+
+# Arquivos de sistema operacional
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+log/
+
+# Específico para o projeto
+# Arquivos de credenciais (se aplicável)
+#*api_key*
+*secrets*
