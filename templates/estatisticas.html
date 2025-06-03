@@ -1,0 +1,208 @@
+{% extends "layout.html" %}
+
+{% block title %}Estatísticas - Compilador Jurídico{% endblock %}
+
+{% block content %}
+<div style="padding: 2rem;">
+    <div class="card-header" style="text-align: center; margin-bottom: 2rem;">
+        <h2 class="card-title" style="font-size: 2.5rem;">
+            📊 Estatísticas dos Processos
+        </h2>
+        <p style="font-size: 1.1rem; opacity: 0.8;">Visão geral dos seus processos cadastrados</p>
+    </div>
+
+    <!-- Cards de Estatísticas -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-number">{{ total }}</span>
+            <span class="stat-label">Total de Processos</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">{{ tj|length }}</span>
+            <span class="stat-label">Processos TJ</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">{{ trf|length }}</span>
+            <span class="stat-label">Processos TRF</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">{{ ((tj|length / total * 100) if total > 0 else 0)|round(1) }}%</span>
+            <span class="stat-label">Proporção TJ</span>
+        </div>
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                ⚡ Ações Rápidas
+            </h3>
+        </div>
+        <div class="hero-buttons">
+            <a href="{{ url_for('gerar_pdf_estatisticas') }}" class="btn btn-primary">
+                📄 Gerar PDF Estatísticas
+            </a>
+            <a href="{{ url_for('consultar') }}" class="btn btn-secondary">
+                🔍 Consultar Processos
+            </a>
+            <a href="{{ url_for('cadastrar') }}" class="btn btn-secondary">
+                ➕ Cadastrar Novo Processo
+            </a>
+        </div>
+    </div>
+
+    <!-- Listas de Processos -->
+    <div class="grid grid-2">
+        <!-- Processos TJ -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    ⚖️ Processos TJ ({{ tj|length }})
+                </h3>
+            </div>
+            {% if tj %}
+                <div class="result-container" style="max-height: 400px; overflow-y: auto;">
+                    {% for processo in tj %}
+                        <div class="result-block" style="margin-bottom: 0.5rem; padding: 0.75rem;">
+                            <strong>{{ processo }}</strong>
+                            <div style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">
+                                <a href="{{ url_for('consultar') }}?numero={{ processo }}&tipo=TJ" 
+                                   style="color: #dc2626; text-decoration: none; margin-right: 1rem;">
+                                    🔍 Consultar
+                                </a>
+                                <a href="{{ url_for('excluir') }}?numero={{ processo }}&tipo=TJ" 
+                                   style="color: #dc2626; text-decoration: none;">
+                                    🗑️ Excluir
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div style="margin-top: 1rem; text-align: center;">
+                    <a href="{{ url_for('consultar_todos', tipo='TJ') }}" class="btn btn-primary">
+                        🔍 Consultar Todos TJ
+                    </a>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 2rem; opacity: 0.6;">
+                    <p>Nenhum processo TJ cadastrado ainda.</p>
+                    <a href="{{ url_for('cadastrar') }}" class="btn btn-secondary" style="margin-top: 1rem;">
+                        ➕ Cadastrar Primeiro Processo TJ
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Processos TRF -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    🏛️ Processos TRF ({{ trf|length }})
+                </h3>
+            </div>
+            {% if trf %}
+                <div class="result-container" style="max-height: 400px; overflow-y: auto;">
+                    {% for processo in trf %}
+                        <div class="result-block" style="margin-bottom: 0.5rem; padding: 0.75rem;">
+                            <strong>{{ processo }}</strong>
+                            <div style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">
+                                <a href="{{ url_for('consultar') }}?numero={{ processo }}&tipo=TRF" 
+                                   style="color: #dc2626; text-decoration: none; margin-right: 1rem;">
+                                    🔍 Consultar
+                                </a>
+                                <a href="{{ url_for('excluir') }}?numero={{ processo }}&tipo=TRF" 
+                                   style="color: #dc2626; text-decoration: none;">
+                                    🗑️ Excluir
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div style="margin-top: 1rem; text-align: center;">
+                    <a href="{{ url_for('consultar_todos', tipo='TRF') }}" class="btn btn-primary">
+                        🔍 Consultar Todos TRF
+                    </a>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 2rem; opacity: 0.6;">
+                    <p>Nenhum processo TRF cadastrado ainda.</p>
+                    <a href="{{ url_for('cadastrar') }}" class="btn btn-secondary" style="margin-top: 1rem;">
+                        ➕ Cadastrar Primeiro Processo TRF
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Informações Adicionais -->
+    {% if total > 0 %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                📈 Análise dos Dados
+            </h3>
+        </div>
+        <div class="grid grid-2">
+            <div>
+                <h4 style="color: #dc2626; margin-bottom: 1rem;">Distribuição por Tribunal</h4>
+                <div style="background: #f8fafc; padding: 1rem; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Tribunal de Justiça (TJ):</span>
+                        <strong>{{ tj|length }} ({{ ((tj|length / total * 100) if total > 0 else 0)|round(1) }}%)</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Tribunal Regional Federal (TRF):</span>
+                        <strong>{{ trf|length }} ({{ ((trf|length / total * 100) if total > 0 else 0)|round(1) }}%)</strong>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h4 style="color: #dc2626; margin-bottom: 1rem;">Últimos Processos Cadastrados</h4>
+                <div style="background: #f8fafc; padding: 1rem; border-radius: 8px;">
+                    {% set ultimos_tj = tj[-3:] %}
+                    {% set ultimos_trf = trf[-3:] %}
+                    
+                    {% if ultimos_tj %}
+                        <div style="margin-bottom: 1rem;">
+                            <strong>TJ:</strong>
+                            {% for processo in ultimos_tj %}
+                                <div style="font-size: 0.9rem; margin-left: 1rem;">• {{ processo }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    {% if ultimos_trf %}
+                        <div>
+                            <strong>TRF:</strong>
+                            {% for processo in ultimos_trf %}
+                                <div style="font-size: 0.9rem; margin-left: 1rem;">• {{ processo }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-refresh da página a cada 30 segundos para estatísticas atualizadas
+    // setTimeout(() => window.location.reload(), 30000);
+    
+    // Pré-popular formulário de consulta com processo clicado
+    const consultarLinks = document.querySelectorAll('a[href*="consultar"]');
+    consultarLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            const url = new URL(this.href);
+            if (url.searchParams.has('numero')) {
+                // Armazenar dados no localStorage para pré-popular o formulário
+                localStorage.setItem('processo_numero', url.searchParams.get('numero'));
+                localStorage.setItem('processo_tipo', url.searchParams.get('tipo'));
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,430 @@
+{% extends "layout.html" %}
+
+{% block title %}Excluir Processos - Compilador Jurídico{% endblock %}
+
+{% block content %}
+<div style="padding: 2rem;">
+    <div class="card-header" style="text-align: center; margin-bottom: 2rem;">
+        <h2 class="card-title" style="font-size: 2.5rem;">
+            🗑️ Excluir Processos
+        </h2>
+        <p style="font-size: 1.1rem; opacity: 0.8;">Remova processos individuais ou em lote da sua lista</p>
+    </div>
+
+    <!-- Aviso de Segurança -->
+    <div class="card" style="background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%); border: 2px solid #fecaca;">
+        <div class="card-header">
+            <h3 class="card-title" style="color: #dc2626;">
+                ⚠️ Atenção - Ação Irreversível
+            </h3>
+        </div>
+        <p style="color: #dc2626; font-weight: 500; margin-bottom: 1rem;">
+            As exclusões são <strong>permanentes</strong> e não podem ser desfeitas. Certifique-se antes de confirmar.
+        </p>
+        <div style="background: #fff; padding: 1rem; border-radius: 8px; border-left: 4px solid #dc2626;">
+            <p style="margin: 0; font-size: 0.9rem; color: #374151;">
+                💡 <strong>Dica:</strong> Considere gerar um PDF das estatísticas antes de excluir para manter um backup dos seus dados.
+            </p>
+        </div>
+    </div>
+
+    <div class="grid grid-2">
+        <!-- Exclusão Individual -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    🎯 Excluir Processo Individual
+                </h3>
+            </div>
+            <form method="POST" id="excluirIndividualForm">
+                <div class="form-group">
+                    <label class="form-label" for="numero">Número do Processo (20 dígitos):</label>
+                    <input type="text" 
+                           id="numero" 
+                           name="numero" 
+                           class="form-input" 
+                           placeholder="Ex: 12345678901234567890"
+                           maxlength="20"
+                           pattern="[0-9]{20}"
+                           {% if request.args.get('numero') %}value="{{ request.args.get('numero') }}"{% endif %}>
+                    <small style="color: #6b7280; font-size: 0.9rem;">
+                        Digite o número exato do processo que deseja excluir
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Tipo do Tribunal:</label>
+                    <div class="radio-group">
+                        <label class="radio-item">
+                            <input type="radio" name="tipo" value="TJ" 
+                                   {% if not request.args.get('tipo') or request.args.get('tipo') == 'TJ' %}checked{% endif %}>
+                            <span>⚖️ TJ</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="tipo" value="TRF"
+                                   {% if request.args.get('tipo') == 'TRF' %}checked{% endif %}>
+                            <span>🏛️ TRF</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <button type="submit" class="btn btn-primary" id="excluirBtn" style="background: #dc2626; width: 100%;">
+                        🗑️ Excluir Este Processo
+                    </button>
+                </div>
+            </form>
+
+            <div style="text-align: center; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+                <p style="font-size: 0.9rem; color: #6b7280; margin-bottom: 1rem;">
+                    Precisa encontrar um processo para excluir?
+                </p>
+                <a href="{{ url_for('estatisticas') }}" class="btn btn-secondary">
+                    📊 Ver Lista de Processos
+                </a>
+            </div>
+        </div>
+
+        <!-- Exclusão em Lote -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    💥 Excluir Todos os Processos
+                </h3>
+            </div>
+            
+            <div style="background: #fef2f2; padding: 1.5rem; border-radius: 8px; border: 2px solid #fecaca; margin-bottom: 1.5rem;">
+                <h4 style="color: #dc2626; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    🚨 Zona de Perigo
+                </h4>
+                <p style="color: #dc2626; font-size: 0.9rem; margin-bottom: 1rem;">
+                    Esta ação excluirá <strong>TODOS</strong> os processos do tipo selecionado. 
+                    Não é possível desfazer esta operação.
+                </p>
+                <p style="color: #dc2626; font-size: 0.9rem; font-weight: 600;">
+                    ⚠️ Use com extrema cautela!
+                </p>
+            </div>
+
+            <form method="POST" id="excluirTodosForm">
+                <input type="hidden" name="todos" value="1">
+                
+                <div class="form-group">
+                    <label class="form-label">Excluir todos os processos do tipo:</label>
+                    <div class="radio-group">
+                        <label class="radio-item">
+                            <input type="radio" name="tipo" value="TJ" checked>
+                            <span>⚖️ Todos os Processos TJ</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="tipo" value="TRF">
+                            <span>🏛️ Todos os Processos TRF</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <button type="button" 
+                            class="btn btn-primary" 
+                            onclick="confirmarExclusaoTodos()" 
+                            style="background: #dc2626; width: 100%;">
+                        💥 Excluir Todos os Processos
+                    </button>
+                </div>
+            </form>
+
+            <div style="text-align: center; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+                <p style="font-size: 0.9rem; color: #6b7280; margin-bottom: 1rem;">
+                    Recomendamos fazer backup antes
+                </p>
+                <a href="{{ url_for('gerar_pdf_estatisticas') }}" class="btn btn-secondary">
+                    📄 Gerar PDF de Backup
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informações sobre Exclusão -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                ℹ️ Informações sobre Exclusão
+            </h3>
+        </div>
+        <div class="grid grid-2">
+            <div>
+                <h4 style="color: #dc2626; margin-bottom: 1rem;">O que Acontece na Exclusão</h4>
+                <ul style="line-height: 1.8; margin-left: 1.5rem;">
+                    <li><strong>Processo Individual:</strong> Remove apenas o número especificado da lista</li>
+                    <li><strong>Exclusão em Lote:</strong> Remove todos os processos do tipo selecionado</li>
+                    <li><strong>Dados Locais:</strong> Afeta apenas os arquivos do seu computador</li>
+                    <li><strong>Sem Backup:</strong> Não há lixeira ou forma de recuperação</li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="color: #dc2626; margin-bottom: 1rem;">Quando Excluir</h4>
+                <ul style="line-height: 1.8; margin-left: 1.5rem;">
+                    <li><strong>Processo Finalizado:</strong> Quando não precisa mais acompanhar</li>
+                    <li><strong>Número Incorreto:</strong> Se cadastrou o número errado</li>
+                    <li><strong>Limpeza Geral:</strong> Para reorganizar sua lista</li>
+                    <li><strong>Troca de Sistema:</strong> Antes de migrar dados</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alternativas à Exclusão -->
+    <div class="card" style="background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%); border: 2px solid #bfdbfe;">
+        <div class="card-header">
+            <h3 class="card-title">
+                💡 Alternativas à Exclusão
+            </h3>
+        </div>
+        <p style="margin-bottom: 1.5rem;">Antes de excluir, considere estas opções:</p>
+        <div class="grid grid-2">
+            <div>
+                <h4 style="color: #1d4ed8; margin-bottom: 1rem;">Organização</h4>
+                <ul style="line-height: 1.8; margin-left: 1.5rem;">
+                    <li>Gere relatórios PDF para arquivamento</li>
+                    <li>Mantenha histórico das consultas</li>
+                    <li>Use as estatísticas para análise</li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="color: #1d4ed8; margin-bottom: 1rem;">Backup</h4>
+                <ul style="line-height: 1.8; margin-left: 1.5rem;">
+                    <li>Exporte listas para outros sistemas</li>
+                    <li>Salve números importantes separadamente</li>
+                    <li>Faça cópias dos arquivos de dados</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <div class="hero-buttons">
+                <a href="{{ url_for('gerar_pdf_estatisticas') }}" class="btn btn-primary">
+                    📄 Gerar Backup PDF
+                </a>
+                <a href="{{ url_for('estatisticas') }}" class="btn btn-secondary">
+                    📊 Ver Estatísticas
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div style="text-align: center; margin-top: 2rem;">
+        <div class="hero-buttons">
+            <a href="{{ url_for('estatisticas') }}" class="btn btn-secondary">
+                ← Voltar às Estatísticas
+            </a>
+            <a href="{{ url_for('cadastrar') }}" class="btn btn-secondary">
+                ➕ Cadastrar Processo
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div id="confirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; padding: 2rem; border-radius: 12px; max-width: 500px; margin: 2rem; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+        <h3 style="color: #dc2626; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+            ⚠️ Confirmação de Exclusão
+        </h3>
+        <p id="confirmMessage" style="margin-bottom: 2rem; line-height: 1.6;"></p>
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+            <button type="button" class="btn btn-secondary" onclick="fecharModal()">
+                ❌ Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" style="background: #dc2626;" onclick="confirmarExclusao()">
+                ✅ Confirmar Exclusão
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+let tipoExclusaoConfirmada = '';
+
+document.addEventListener('DOMContentLoaded', function() {
+    const numeroInput = document.getElementById('numero');
+    
+    // Validação em tempo real para exclusão individual
+    numeroInput.addEventListener('input', function() {
+        const valor = this.value.replace(/\D/g, '');
+        this.value = valor.slice(0, 20);
+        
+        const excluirBtn = document.getElementById('excluirBtn');
+        if (valor.length === 20) {
+            this.style.borderColor = '#22c55e';
+            this.style.backgroundColor = '#f0fdf4';
+            excluirBtn.disabled = false;
+        } else if (valor.length > 0) {
+            this.style.borderColor = '#f59e0b';
+            this.style.backgroundColor = '#fffbeb';
+            excluirBtn.disabled = false;
+        } else {
+            this.style.borderColor = '#e5e7eb';
+            this.style.backgroundColor = '#ffffff';
+            excluirBtn.disabled = false;
+        }
+    });
+
+    // Prevenir caracteres não-numéricos
+    numeroInput.addEventListener('keypress', function(e) {
+        const char = String.fromCharCode(e.which);
+        if (!/[0-9]/.test(char)) {
+            e.preventDefault();
+        }
+    });
+
+    // Confirmação para exclusão individual
+    document.getElementById('excluirIndividualForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const numero = document.getElementById('numero').value;
+        const tipo = document.querySelector('input[name="tipo"]:checked').value;
+        
+        if (!numero) {
+            alert('Por favor, digite o número do processo.');
+            return;
+        }
+        
+        if (numero.length !== 20) {
+            alert('O número do processo deve ter exatamente 20 dígitos.');
+            return;
+        }
+        
+        const confirmMessage = `Tem certeza que deseja excluir o processo ${tipo} ${numero}?\n\nEsta ação não pode ser desfeita.`;
+        
+        if (confirm(confirmMessage)) {
+            document.getElementById('excluirBtn').innerHTML = '<span class="spinner"></span>Excluindo...';
+            document.getElementById('excluirBtn').disabled = true;
+            this.submit();
+        }
+    });
+
+    // Pré-popular se vier das estatísticas
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('numero') && urlParams.has('tipo')) {
+        numeroInput.value = urlParams.get('numero');
+        numeroInput.dispatchEvent(new Event('input'));
+        document.querySelector(`input[name="tipo"][value="${urlParams.get('tipo')}"]`).checked = true;
+        
+        // Atualizar visual dos radio buttons
+        document.querySelectorAll('.radio-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        document.querySelector(`input[name="tipo"][value="${urlParams.get('tipo')}"]`).closest('.radio-item').classList.add('active');
+    }
+});
+
+function confirmarExclusaoTodos() {
+    const tipo = document.querySelector('input[name="tipo"]:checked').value;
+    const tipoNome = tipo === 'TJ' ? 'Tribunal de Justiça' : 'Tribunal Regional Federal';
+    
+    document.getElementById('confirmMessage').innerHTML = `
+        <strong style="color: #dc2626;">ATENÇÃO: AÇÃO IRREVERSÍVEL</strong><br><br>
+        Você está prestes a excluir <strong>TODOS</strong> os processos do ${tipoNome} (${tipo}).<br><br>
+        Esta ação não pode ser desfeita e todos os dados serão perdidos permanentemente.<br><br>
+        <strong>Tem certeza absoluta que deseja continuar?</strong>
+    `;
+    
+    tipoExclusaoConfirmada = tipo;
+    document.getElementById('confirmModal').style.display = 'flex';
+}
+
+function fecharModal() {
+    document.getElementById('confirmModal').style.display = 'none';
+    tipoExclusaoConfirmada = '';
+}
+
+function confirmarExclusao() {
+    if (tipoExclusaoConfirmada) {
+        // Criar e enviar formulário
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.innerHTML = `
+            <input type="hidden" name="todos" value="1">
+            <input type="hidden" name="tipo" value="${tipoExclusaoConfirmada}">
+        `;
+        document.body.appendChild(form);
+        form.submit();
+    }
+    fecharModal();
+}
+
+// Fechar modal clicando fora
+document.getElementById('confirmModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        fecharModal();
+    }
+});
+
+// Atalhos de teclado
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        fecharModal();
+    }
+});
+</script>
+
+<style>
+/* Estilos específicos para página de exclusão */
+.btn[style*="background: #dc2626"] {
+    border: 2px solid #dc2626;
+    transition: all 0.3s ease;
+}
+
+.btn[style*="background: #dc2626"]:hover {
+    background: #b91c1c !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+}
+
+.btn[style*="background: #dc2626"]:active {
+    transform: translateY(0);
+}
+
+#confirmModal {
+    backdrop-filter: blur(5px);
+}
+
+#confirmModal > div {
+    animation: modalAppear 0.3s ease-out;
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Feedback visual para ações perigosas */
+.card[style*="border: 2px solid #fecaca"] {
+    position: relative;
+    overflow: hidden;
+}
+
+.card[style*="border: 2px solid #fecaca"]:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.1), transparent);
+    animation: warningGlow 3s infinite;
+}
+
+@keyframes warningGlow {
+    0%, 100% { left: -100%; }
+    50% { left: 100%; }
+}
+</style>
+{% endblock %}
