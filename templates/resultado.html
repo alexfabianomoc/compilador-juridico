@@ -1,0 +1,405 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {% if todos %}
+        Resultados Consulta em Lote {{ tipo }} - Compilador Jurídico
+    {% else %}
+        Resultado Processo {{ numero }} - Compilador Jurídico
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div style="padding: 2rem;">
+    {% if todos %}
+        <!-- Consulta em Lote -->
+        <div class="card-header" style="text-align: center; margin-bottom: 2rem;">
+            <h2 class="card-title" style="font-size: 2.5rem;">
+                📊 Consulta em Lote - {{ tipo }}
+            </h2>
+            <p style="font-size: 1.1rem; opacity: 0.8;">Resultados de todos os processos {{ "TJ" if tipo == "TJ" else "TRF" }} cadastrados</p>
+        </div>
+
+        <!-- Ações Rápidas -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    ⚡ Ações Rápidas
+                </h3>
+            </div>
+            <div class="hero-buttons">
+                <a href="{{ url_for('gerar_pdf_consulta_lote', tipo=tipo) }}" class="btn btn-primary">
+                    📄 Gerar PDF dos Resultados
+                </a>
+                <a href="{{ url_for('consultar') }}" class="btn btn-secondary">
+                    🔍 Nova Consulta
+                </a>
+                <a href="{{ url_for('estatisticas') }}" class="btn btn-secondary">
+                    📊 Ver Estatísticas
+                </a>
+            </div>
+        </div>
+
+        <!-- Resumo dos Resultados -->
+        {% if resultados %}
+        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+            <div class="stat-card">
+                <span class="stat-number">{{ resultados|length }}</span>
+                <span class="stat-label">Processos Consultados</span>
+            </div>
+            <div class="stat-card">
+                {% set encontrados = 0 %}
+                {% for numero, dados in resultados.items() %}
+                    {% if dados and dados.get('hits') and dados.hits.get('total') and dados.hits.total.get('value', 0) > 0 %}
+                        {% set encontrados = encontrados + 1 %}
+                    {% endif %}
+                {% endfor %}
+                <span class="stat-number">{{ encontrados }}</span>
+                <span class="stat-label">Processos Encontrados</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">{{ resultados|length - encontrados }}</span>
+                <span class="stat-label">Não Encontrados</span>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Lista de Resultados -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    📋 Detalhes dos Processos
+                </h3>
+            </div>
+            
+            {% if resultados %}
+                {% for numero, dados in resultados.items() %}
+                    <div class="result-block" style="margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h4 style="color: #dc2626; font-size: 1.2rem; margin: 0;">
+                                {{ "⚖️" if tipo == "TJ" else "🏛️" }} Processo {{ numero }}
+                            </h4>
+                            <span style="font-size: 0.9rem; color: #6b7280;">
+                                {{ "TJMG" if tipo == "TJ" else "TRF6" }}
+                            </span>
+                        </div>
+
+                        {% if dados and dados.get('hits') and dados.hits.get('total') and dados.hits.total.get('value', 0) > 0 %}
+                            {% if dados.hits.get('hits') and dados.hits.hits|length > 0 %}
+                                {% set source = dados.hits.hits[0].get('_source', {}) %}
+                                <div class="grid grid-2" style="gap: 1rem;">
+                                    <div>
+                                        <strong>Status:</strong> 
+                                        <span style="color: #059669;">Encontrado</span><br>
+                                        
+                                        {% if tipo == "TJ" %}
+                                            {% if source.get('tribunal') %}
+                                                <strong>Tribunal:</strong> {{ source.tribunal }}<br>
+                                            {% endif %}
+                                            {% if source.get('dataAjuizamento') %}
+                                                <strong>Data Ajuizamento:</strong> 
+                                                {% set data_str = source.dataAjuizamento.split('T')[0] %}
+                                                {{ data_str|format_date }}<br>
+                                            {% endif %}
+                                            {% if source.get('classe') and source.classe.get('nome') %}
+                                                <strong>Classe:</strong> {{ source.classe.nome }}<br>
+                                            {% endif %}
+                                        {% else %}
+                                            {% if source.get('classeProcessual') %}
+                                                <strong>Classe:</strong> {{ source.classeProcessual }}<br>
+                                            {% elif source.get('classe') and source.classe.get('nome') %}
+                                                <strong>Classe:</strong> {{ source.classe.nome }}<br>
+                                            {% endif %}
+                                            {% if source.get('dataAjuizamento') %}
+                                                <strong>Data Ajuizamento:</strong> {{ source.dataAjuizamento }}<br>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        {% if source.get('dataHoraUltimaAtualizacao') %}
+                                            <strong>Última Atualização:</strong>
+                                            {% set data_str = source.dataHoraUltimaAtualizacao.split('T')[0] %}
+                                            {{ data_str|format_date }}<br>
+                                        {% endif %}
+                                        
+                                        {% if source.get('assuntos') and source.assuntos|length > 0 %}
+                                            <strong>Assunto:</strong> {{ source.assuntos[0].get('nome', 'N/A') }}<br>
+                                        {% endif %}
+                                        
+                                        {% if tipo == "TRF" and source.get('orgaoJulgador') %}
+                                            <strong>Órgão Julgador:</strong> 
+                                            {% if source.orgaoJulgador.get('nome') %}
+                                                {{ source.orgaoJulgador.nome }}
+                                            {% else %}
+                                                {{ source.orgaoJulgador }}
+                                            {% endif %}<br>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div style="color: #dc2626;">
+                                    <strong>Status:</strong> Encontrado, mas sem detalhes<br>
+                                    <em>Dados não disponíveis.</em>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div style="color: #dc2626;">
+                                <strong>Status:</strong> Não encontrado<br>
+                                <em>O processo pode estar em sigilo ou não existir na base de dados.</em>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div style="text-align: center; padding: 2rem; opacity: 0.6;">
+                    <p>Nenhum resultado disponível.</p>
+                </div>
+            {% endif %}
+        </div>
+
+    {% else %}
+        <!-- Consulta Individual -->
+        <div class="card-header" style="text-align: center; margin-bottom: 2rem;">
+            <h2 class="card-title" style="font-size: 2.5rem;">
+                {{ "⚖️" if tipo == "TJ" else "🏛️" }} Processo {{ numero }}
+            </h2>
+            <p style="font-size: 1.1rem; opacity: 0.8;">{{ "Tribunal de Justiça (TJMG)" if tipo == "TJ" else "Tribunal Regional Federal (TRF6)" }}</p>
+        </div>
+
+        <!-- Ações Rápidas -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    ⚡ Ações Rápidas
+                </h3>
+            </div>
+            <div class="hero-buttons">
+                <a href="{{ url_for('gerar_pdf_consulta_individual') }}" class="btn btn-primary">
+                    📄 Gerar PDF da Consulta
+                </a>
+                <a href="{{ url_for('consultar') }}" class="btn btn-secondary">
+                    🔍 Nova Consulta
+                </a>
+                <a href="{{ url_for('cadastrar') }}?numero={{ numero }}&tipo={{ tipo }}" class="btn btn-secondary">
+                    ➕ Cadastrar Este Processo
+                </a>
+            </div>
+        </div>
+
+        <!-- Resultado da Consulta -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    📋 Resultado da Consulta
+                </h3>
+            </div>
+            
+            {% if resultado and resultado.get('erro') %}
+                <div class="alert alert-error">
+                    <strong>Erro na consulta:</strong> {{ resultado.erro }}
+                </div>
+            {% elif resultado and resultado.get('hits') and resultado.hits.get('total') and resultado.hits.total.get('value', 0) > 0 %}
+                {% set hits = resultado.hits.get('hits', []) %}
+                {% if hits and hits|length > 0 %}
+                    {% set source = hits[0].get('_source', {}) %}
+                    
+                    <!-- Status da Consulta -->
+                    <div class="alert alert-success">
+                        <strong>✅ Consulta realizada com sucesso!</strong> 
+                        Processo encontrado na base de dados.
+                    </div>
+
+                    <!-- Informações Básicas -->
+                    <div class="result-block">
+                        <h4 style="color: #dc2626; margin-bottom: 1rem;">📋 Informações Básicas</h4>
+                        <div class="grid grid-2">
+                            <div>
+                                <p><strong>Número do Processo:</strong> {{ numero }}</p>
+                                {% if tipo == "TJ" %}
+                                    {% if source.get('tribunal') %}
+                                        <p><strong>Tribunal:</strong> {{ source.tribunal }}
+                                        {% if source.tribunal == "TJMG" %}
+                                            (Tribunal de Justiça de Minas Gerais)
+                                        {% endif %}
+                                        </p>
+                                    {% endif %}
+                                    {% if source.get('dataAjuizamento') %}
+                                        <p><strong>Data de Ajuizamento:</strong> {{ source.dataAjuizamento|format_date }}</p>
+                                    {% endif %}
+                                {% else %}
+                                    {% if source.get('classeProcessual') %}
+                                        <p><strong>Classe Processual:</strong> {{ source.classeProcessual }}</p>
+                                    {% elif source.get('classe') and source.classe.get('nome') %}
+                                        <p><strong>Classe Processual:</strong> {{ source.classe.nome }}</p>
+                                    {% endif %}
+                                    {% if source.get('dataAjuizamento') %}
+                                        <p><strong>Data de Ajuizamento:</strong> {{ source.dataAjuizamento }}</p>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <div>
+                                {% if source.get('assuntos') and source.assuntos|length > 0 %}
+                                    <p><strong>Assunto:</strong> {{ source.assuntos[0].get('nome', 'N/A') }}</p>
+                                {% endif %}
+                                {% if source.get('formato') and source.formato.get('nome') %}
+                                    <p><strong>Formato:</strong> {{ source.formato.nome }}</p>
+                                {% endif %}
+                                {% if tipo == "TRF" and source.get('orgaoJulgador') %}
+                                    <p><strong>Órgão Julgador:</strong> 
+                                    {% if source.orgaoJulgador.get('nome') %}
+                                        {{ source.orgaoJulgador.nome }}
+                                    {% else %}
+                                        {{ source.orgaoJulgador }}
+                                    {% endif %}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Situação Atual -->
+                    <div class="result-block">
+                        <h4 style="color: #dc2626; margin-bottom: 1rem;">📊 Situação Atual</h4>
+                        {% if source.get('dataHoraUltimaAtualizacao') %}
+                            <p><strong>Última Atualização:</strong> {{ source.dataHoraUltimaAtualizacao|format_date }}</p>
+                        {% endif %}
+                        
+                        {% if source.get('movimentos') and source.movimentos|length > 0 %}
+                            {% set movimentos = source.movimentos|sort(attribute='dataHora', reverse=true) %}
+                            {% set ultimo_movimento = movimentos[0] %}
+                            <p><strong>Último Movimento:</strong> 
+                                [{{ ultimo_movimento.get('codigo', 'N/A') }}] {{ ultimo_movimento.get('nome', 'N/A') }}
+                                {% if ultimo_movimento.get('dataHora') %}
+                                    ({{ ultimo_movimento.dataHora|format_date }})
+                                {% endif %}
+                            </p>
+                            
+                            <!-- Status baseado nos movimentos -->
+                            {% set ns = namespace(status="Em andamento") %}
+                            {% for mov in movimentos %}
+                                {% if mov.get('codigo') == 22 and ns.status == "Em andamento" %}
+                                    {% set ns.status = "Arquivado definitivamente" %}
+                                {% elif mov.get('codigo') == 848 and ns.status == "Em andamento" %}
+                                    {% set ns.status = "Transitado em julgado" %}
+                                {% elif mov.get('codigo') == 246 and ns.status == "Em andamento" %}
+                                    {% set ns.status = "Arquivado definitivamente" %}
+                                {% endif %}
+                            {% endfor %}
+                            <p><strong>Status:</strong> 
+                                <span style="color: {% if ns.status == 'Em andamento' %}#059669{% else %}#dc2626{% endif %};">
+                                    {{ ns.status }}
+                                </span>
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Movimentações Recentes -->
+                    {% if source.get('movimentos') and source.movimentos|length > 0 %}
+                    <div class="result-block">
+                        <h4 style="color: #dc2626; margin-bottom: 1rem;">📝 Movimentações Recentes</h4>
+                        <div style="max-height: 300px; overflow-y: auto;">
+                            {% set movimentos = source.movimentos|sort(attribute='dataHora', reverse=true) %}
+                            {% for movimento in movimentos[:10] %}
+                                <div style="border-bottom: 1px solid #e5e7eb; padding: 0.75rem 0;">
+                                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                                        <div style="flex: 1;">
+                                            <strong>[{{ movimento.get('codigo', 'N/A') }}]</strong> {{ movimento.get('nome', 'N/A') }}
+                                        </div>
+                                        <div style="font-size: 0.9rem; color: #6b7280; min-width: 100px; text-align: right;">
+                                            {% if movimento.get('dataHora') %}
+                                                {{ movimento.dataHora|format_date }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <!-- Dados encontrados mas sem hits específicos -->
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Processo encontrado, mas sem detalhes disponíveis</strong>
+                    </div>
+                {% endif %}
+
+            {% else %}
+                <!-- Processo não encontrado -->
+                <div class="alert alert-warning">
+                    <strong>⚠️ Processo não encontrado</strong>
+                </div>
+                
+                <div class="result-block">
+                    <h4 style="color: #dc2626; margin-bottom: 1rem;">❌ Processo Não Encontrado</h4>
+                    <p>A consulta foi realizada com sucesso, mas não há informações sobre o processo <strong>{{ numero }}</strong> no {{ "TJMG" if tipo == "TJ" else "TRF6" }}.</p>
+                    
+                    <h5 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: #dc2626;">Possíveis motivos:</h5>
+                    <ul style="line-height: 1.8; margin-left: 1.5rem;">
+                        <li>O número do processo pode estar incorreto</li>
+                        <li>O processo pode estar em sigilo</li>
+                        <li>O processo pode não existir na base de dados</li>
+                        <li>O processo pode pertencer a outro tribunal</li>
+                    </ul>
+                    
+                    <div style="margin-top: 1.5rem;">
+                        <a href="{{ url_for('consultar') }}" class="btn btn-secondary">
+                            🔍 Tentar Nova Consulta
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <!-- Voltar -->
+    <div style="text-align: center; margin-top: 2rem;">
+        <div class="hero-buttons">
+            <a href="{{ url_for('consultar') }}" class="btn btn-secondary">
+                ← Voltar às Consultas
+            </a>
+            <a href="{{ url_for('estatisticas') }}" class="btn btn-secondary">
+                📊 Ver Estatísticas
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Debug: Log informações no console
+    console.log('Página resultado.html carregada');
+    console.log('Tipo:', '{{ tipo }}');
+    console.log('Número:', '{{ numero if numero else "N/A" }}');
+    console.log('Todos:', {{ todos|tojson }});
+
+    // Marcar links de PDF na sessão para próximas visitas
+    const pdfLinks = document.querySelectorAll('a[href*="pdf"]');
+    pdfLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            // Feedback visual durante geração do PDF
+            const originalText = this.innerHTML;
+            this.innerHTML = '<span class="spinner"></span>Gerando PDF...';
+            this.style.pointerEvents = 'none';
+            
+            // Restaurar após 3 segundos
+            setTimeout(() => {
+                this.innerHTML = originalText;
+                this.style.pointerEvents = 'auto';
+            }, 3000);
+        });
+    });
+
+    // Auto-scroll para resultado se é uma consulta individual
+    {% if not todos and resultado %}
+        setTimeout(() => {
+            const resultBlock = document.querySelector('.result-block');
+            if (resultBlock) {
+                resultBlock.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }
+        }, 500);
+    {% endif %}
+});
+</script>
+{% endblock %}

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Compilador Jurídico{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Compilador Jurídico</h1>
+            <nav>
+                <a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}class="active"{% endif %}>Início</a>
+                <a href="{{ url_for('estatisticas') }}" {% if request.endpoint == 'estatisticas' %}class="active"{% endif %}>Estatísticas</a>
+                <a href="{{ url_for('cadastrar') }}" {% if request.endpoint == 'cadastrar' %}class="active"{% endif %}>Cadastrar</a>
+                <a href="{{ url_for('consultar') }}" {% if request.endpoint == 'consultar' %}class="active"{% endif %}>Consultar</a>
+                <a href="{{ url_for('excluir') }}" {% if request.endpoint == 'excluir' %}class="active"{% endif %}>Excluir</a>
+                <a href="{{ url_for('manual') }}" {% if request.endpoint == 'manual' %}class="active"{% endif %}>Manual</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alerts">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'success' if category == 'success' else 'warning' if category == 'warning' else 'error' }}">
+                            <span>{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <main class="fade-in">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Compilador Jurídico. Sistema de Gestão de Processos Jurídicos.</p>
+    </footer>
+
+    <script>
+        // Animações e interações básicas
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-hide alerts após 5 segundos
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateY(-20px)';
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            });
+
+            // Ativar radio buttons visuais
+            const radioItems = document.querySelectorAll('.radio-item');
+            radioItems.forEach(item => {
+                const radio = item.querySelector('input[type="radio"]');
+                if (radio) {
+                    if (radio.checked) {
+                        item.classList.add('active');
+                    }
+                    radio.addEventListener('change', function() {
+                        // Remove active de todos os itens do mesmo grupo
+                        const groupName = this.name;
+                        document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => {
+                            r.closest('.radio-item').classList.remove('active');
+                        });
+                        // Adiciona active ao item selecionado
+                        this.closest('.radio-item').classList.add('active');
+                    });
+                }
+            });
+
+            // Loading states para formulários
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+                    if (submitBtn) {
+                        submitBtn.innerHTML = '<span class="spinner"></span>Processando...';
+                        submitBtn.disabled = true;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+{% extends "layout.html" %}
+
+{% block title %}Manual do Usuário - Compilador Jurídico{% endblock %}
+
+{% block content %}
+<div style="padding: 2rem;">
+    <div class="card-header" style="text-align: center; margin-bottom: 2rem;">
+        <h2 class="card-title" style="font-size: 2.5rem;">
+            📖 Manual do Usuário
+        </h2>
+        <p style="font-size: 1.1rem; opacity: 0.8;">Guia completo para usar o Compilador Jurídico</p>
+    </div>
+
+    <!-- Acesso ao Manual -->
+    <div class="card" style="text-align: center; background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%); border: 2px solid #fecaca;">
+        <div class="card-header">
+            <h3 class="card-title">
+                📄 Acesso ao Manual Completo
+            </h3>
+        </div>
+        <p style="font-size: 1.1rem; margin-bottom: 2rem;">Baixe ou visualize o manual completo em PDF com todas as instruções detalhadas.</p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('abrir_manual') }}" class="btn btn-primary" target="_blank">
+                📥 Abrir Manual PDF
+            </a>
+            <a href="https://github.com/seu-usuario/compilador-juridico/blob/main/docs/manual.pdf" class="btn btn-secondary" target="_blank">
+                🌐 Manual Online
+            </a>
+        </div>
+    </div>
+
+    <!-- Guia Rápido -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                ⚡ Guia Rápido de Uso
+            </h3>
+        </div>
+        <div class="grid grid-2">
+            <div>
+                <h4 style="color: #dc2626; margin-bottom: 1rem;">1. Cadastrar Processos</h4>
+                <ul style="line-height: 1.8; margin-left: 1.5rem; margin-bottom: 2rem;">
+                    <li>Acesse a seção <strong>Cadastrar</strong></li>
+                    <li>Digite o número do processo (20 dígitos)</li>
+                    <li>Selecione o tipo: TJ ou TRF</li>
+                    <li>Clique em <strong>Cadastrar</strong></li>
+                </ul>
+
+                <h4 style="color: #dc2626; margin-bottom: 1rem;">2. Consultar Processos</h4>
+                <ul style="line-height: 1.8; margin-left: 1.5rem;">
+                    <li>Acesse a seção <strong>Consultar</strong></li>
+                    <li>Para consulta individual: digite o número e tipo</li>
+                    <li>Para consulta em lote: use os botões específicos</li>
+                    <li>Gere PDFs das consultas quando necessário</li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="color: #dc2626; margin-bottom: 1rem;">3. Ver Estatísticas</h4>
+                <ul style="line-height: 1.8; margin-left: 1.5rem; margin-bottom: 2rem;">
+                    <li>Acesse a seção <strong>Estatísticas</strong></li>
+                    <li>Visualize totais e distribuições</li>
+                    <li>Gere relatórios em PDF</li>
+                    <li>Consulte listas organizadas</li>
+                </ul>
+
+                <h4 style="color: #dc2626; margin-bottom: 1rem;">4. Gerenciar Processos</h4>
+                <ul style="line-height: 1.8; margin-left: 1.5rem;">
+                    <li>Acesse a seção <strong>Excluir</strong></li>
+                    <li>Exclua processos individualmente</li>
+                    <li>Ou exclua todos de um tipo específico</li>
+                    <li>Confirme as exclusões com cuidado</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Perguntas Frequentes -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                ❓ Perguntas Frequentes
+            </h3>
+        </div>
+        
+        <div class="faq-item" style="margin-bottom: 2rem; padding: 1rem; background: #f8fafc; border-radius: 8px;">
+            <h4 style="color: #dc2626; margin-bottom: 0.5rem;">Qual o formato correto do número do processo?</h4>
+            <p>O número deve ter exatamente 20 dígitos numéricos, seguindo o padrão CNJ. Exemplo: 12345678901234567890</p>
+        </div>
+
+        <div class="faq-item" style="margin-bottom: 2rem; padding: 1rem; background: #f8fafc; border-radius: 8px;">
+            <h4 style="color: #dc2626; margin-bottom: 0.5rem;">Quais tribunais são suportados?</h4>
+            <p>Atualmente o sistema suporta:</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>TJ:</strong> Tribunal de Justiça de Minas Gerais (TJMG)</li>
+                <li><strong>TRF:</strong> Tribunal Regional Federal da 6ª Região (TRF6)</li>
+            </ul>
+        </div>
+
+        <div class="faq-item" style="margin-bottom: 2rem; padding: 1rem; background: #f8fafc; border-radius: 8px;">
+            <h4 style="color: #dc2626; margin-bottom: 0.5rem;">Como funcionam as consultas?</h4>
+            <p>As consultas são feitas através da API DataJud oficial dos tribunais, garantindo informações atualizadas e precisas sobre os processos.</p>
+        </div>
+
+        <div class="faq-item" style="margin-bottom: 2rem; padding: 1rem; background: #f8fafc; border-radius: 8px;">
+            <h4 style="color: #dc2626; margin-bottom: 0.5rem;">Posso gerar relatórios?</h4>
+            <p>Sim! O sistema permite gerar relatórios em PDF de:</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Estatísticas dos processos cadastrados</li>
+                <li>Resultados de consultas individuais</li>
+                <li>Resultados de consultas em lote</li>
+            </ul>
+        </div>
+
+        <div class="faq-item" style="padding: 1rem; background: #f8fafc; border-radius: 8px;">
+            <h4 style="color: #dc2626; margin-bottom: 0.5rem;">Os dados ficam salvos onde?</h4>
+            <p>Os dados ficam armazenados localmente no seu computador, em arquivos JSON seguros. Nenhuma informação é enviada para servidores externos, exceto durante as consultas aos tribunais.</p>
+        </div>
+    </div>
+
+    <!-- Suporte Técnico -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                🛠️ Suporte Técnico
+            </h3>
+        </div>
+        <div class="grid grid-2">
+            <div>
+                <h4 style="color: #dc2626; margin-bottom: 1rem;">Problemas Comuns</h4>
+                <ul style="line-height: 1.8; margin-left: 1.5rem;">
+                    <li><strong>Erro de validação:</strong> Verifique se o número tem 20 dígitos</li>
+                    <li><strong>Consulta falhou:</strong> Verifique sua conexão com a internet</li>
+                    <li><strong>PDF não gerado:</strong> Verifique permissões de escrita na pasta</li>
+                    <li><strong>Processo não encontrado:</strong> Pode estar em sigilo ou não existir</li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="color: #dc2626; margin-bottom: 1rem;">Requisitos do Sistema</h4>
+                <ul style="line-height: 1.8; margin-left: 1.5rem;">
+                    <li>Python 3.8 ou superior</li>
+                    <li>Conexão com a internet para consultas</li>
+                    <li>Navegador web moderno</li>
+                    <li>Permissões para criar arquivos locais</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div style="text-align: center; margin-top: 2rem;">
+        <div class="hero-buttons">
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                🏠 Voltar ao Início
+            </a>
+            <a href="{{ url_for('cadastrar') }}" class="btn btn-primary">
+                🚀 Começar a Usar
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.faq-item {
+    border-left: 4px solid #dc2626;
+    transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1);
+}
+</style>
+{% endblock %}

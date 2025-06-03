@@ -1,280 +1,531 @@
-# Manual de Instalação e Inicialização - Compilador Jurídico
+# Manual de Instalação e Configuração - Compilador Jurídico Web
 
-## Índice
+## 📚 Índice
 1. [Introdução](#introdução)
 2. [Requisitos do Sistema](#requisitos-do-sistema)
 3. [Instalação Passo a Passo](#instalação-passo-a-passo)
-4. [Inicialização do Sistema](#inicialização-do-sistema)
+4. [Configuração e Inicialização](#configuração-e-inicialização)
 5. [Verificação da Instalação](#verificação-da-instalação)
-6. [Solução de Problemas](#solução-de-problemas)
-7. [Atualizações](#atualizações)
+6. [Configurações Avançadas](#configurações-avançadas)
+7. [Solução de Problemas](#solução-de-problemas)
+8. [Deploy em Produção](#deploy-em-produção)
 
-## Introdução
+## 🎯 Introdução
 
-Este manual fornece instruções detalhadas para a instalação e inicialização do **Compilador Jurídico**, uma ferramenta para gerenciamento e consulta de processos judiciais. Siga cuidadosamente estas instruções para garantir uma configuração adequada do sistema.
+O **Compilador Jurídico** é agora uma aplicação web moderna desenvolvida com **Flask**, oferecendo uma interface responsiva e intuitiva para gerenciamento de processos judiciais. Este manual fornece instruções completas para instalação, configuração e execução do sistema.
 
-## Requisitos do Sistema
+### 🆕 Novidades da Versão Web
+- **Interface Web Responsiva**: Acesso via navegador
+- **Design Moderno**: CSS com animações e gradientes
+- **Validação em Tempo Real**: Feedback instantâneo
+- **Relatórios PDF Aprimorados**: Geração profissional
+- **Sistema de Sessões**: Estado persistente entre consultas
+- **Cache Inteligente**: Gerenciamento automático de arquivos temporários
 
-Antes de iniciar a instalação, certifique-se de que seu sistema atende aos seguintes requisitos:
+## 💻 Requisitos do Sistema
 
-### Hardware Recomendado
-- Processador: 1.6 GHz ou superior
-- Memória RAM: Mínimo 4 GB
-- Espaço em disco: 500 MB disponíveis
-- Resolução de tela: 1280 x 720 ou superior
+### Hardware Mínimo
+- **Processador**: 1.6 GHz dual-core
+- **Memória RAM**: 4 GB (8 GB recomendado)
+- **Espaço em Disco**: 1 GB disponível
+- **Conexão Internet**: Estável para consultas API
 
 ### Software Necessário
-- Sistema Operacional:
-  * Windows 10/11
-  * macOS 10.14 ou superior
-  * Linux (Ubuntu 20.04+, Debian 10+, Fedora 34+)
-- Python 3.8 ou superior
-- Conexão estável com a Internet
 
-### Dependências Python
-O Compilador Jurídico requer as seguintes bibliotecas Python:
-- certifi==2025.4.26
-- chardet==5.2.0
-- charset-normalizer==3.4.2
-- idna==3.10
-- pillow==11.2.1
-- reportlab==4.4.1
-- requests==2.32.3
-- urllib3==2.4.0
-- tkinter (normalmente incluído na instalação padrão do Python)
+#### Sistemas Operacionais Suportados
+- **Windows**: 10/11 (64-bit)
+- **macOS**: 10.15 (Catalina) ou superior
+- **Linux**: Ubuntu 20.04+, Debian 11+, CentOS 8+, Fedora 35+
 
-## Instalação Passo a Passo
+#### Python e Dependências
+- **Python**: 3.8 ou superior (3.10+ recomendado)
+- **pip**: Gerenciador de pacotes Python
+- **Navegador Web**: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
+
+#### Dependências Python (Automáticas)
+```txt
+Flask==3.1.1
+Flask-Session==0.8.0
+Flask-Babel==4.0.0
+blinker==1.9.0
+reportlab==4.4.1
+requests==2.32.3
+Pillow==11.2.1
+Werkzeug==3.1.3
+Jinja2==3.1.6
+```
+
+## 🔧 Instalação Passo a Passo
 
 ### 1. Instalação do Python
 
-**Windows:**
-1. Acesse [python.org](https://www.python.org/downloads/)
-2. Baixe a versão mais recente do Python 3.8+
-3. Execute o instalador e marque a opção "Add Python to PATH"
-4. Clique em "Install Now" e aguarde a conclusão
+#### Windows
+1. Acesse [python.org/downloads](https://www.python.org/downloads/)
+2. Baixe Python 3.10+ (recomendado)
+3. **IMPORTANTE**: Marque "Add Python to PATH" durante instalação
+4. Execute o instalador como administrador
+5. Verifique a instalação:
+   ```cmd
+   python --version
+   pip --version
+   ```
 
-**macOS:**
-1. Acesse [python.org](https://www.python.org/downloads/)
-2. Baixe a versão mais recente do Python 3.8+
-3. Execute o instalador e siga as instruções
-4. Verifique a instalação abrindo o Terminal e digitando `python3 --version`
+#### macOS
+```bash
+# Usando Homebrew (recomendado)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew install python@3.10
 
-**Linux:**
+# Ou download direto do python.org
+# Verifique a instalação
+python3 --version
+pip3 --version
+```
+
+#### Linux (Ubuntu/Debian)
 ```bash
 sudo apt update
-sudo apt install python3 python3-pip python3-tk
+sudo apt install python3.10 python3.10-pip python3.10-venv
+sudo apt install python3.10-dev build-essential
+
+# Verifique a instalação
+python3.10 --version
+pip3 --version
 ```
 
-### 2. Download do Compilador Jurídico
-
-1. Baixe o arquivo compactado do Compilador Jurídico do repositório oficial
-2. Extraia o conteúdo para um diretório de sua preferência
-3. Anote o caminho completo para este diretório
-
-### 3. Instalação das Dependências
-
-1. Abra o terminal ou prompt de comando
-2. Navegue até o diretório onde você extraiu o Compilador Jurídico
-   ```bash
-   cd caminho/para/compilador-juridico
-   ```
-3. Instale as dependências necessárias usando o arquivo requirements.txt:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-Para usuários do Windows, pode ser necessário usar:
+#### Linux (CentOS/RHEL/Fedora)
 ```bash
-python -m pip install -r requirements.txt
+# CentOS/RHEL
+sudo dnf install python3.10 python3.10-pip python3.10-devel
+
+# Fedora
+sudo dnf install python3 python3-pip python3-devel
+
+# Verifique a instalação
+python3 --version
+pip3 --version
 ```
 
-Para usuários do macOS/Linux, pode ser necessário usar:
+### 2. Download e Preparação
+
+#### Opção A: Git (Recomendado)
 ```bash
-python3 -m pip install -r requirements.txt
+# Clone o repositório
+git clone https://github.com/alexfabianomoc/compilador_juridico.git
+cd compilador_juridico
+
+# Verifique se todos os arquivos estão presentes
+ls -la
 ```
 
-### 4. Verificação da Estrutura de Diretórios
+#### Opção B: Download ZIP
+1. Baixe o arquivo ZIP do repositório
+2. Extraia para um diretório de sua escolha
+3. Navegue até o diretório extraído
 
-O Compilador Jurídico está configurado para detectar automaticamente a localização de instalação e criar os diretórios necessários na primeira execução. A estrutura padrão é:
+### 3. Configuração do Ambiente Virtual
 
-```
-compilador-juridico/
-├── assets/
-│   └── cache/        # Criado automaticamente na primeira execução
-├── src/
-│   ├── api/
-│   ├── config.py     # Configuração com detecção automática de caminho
-│   ├── models/
-│   └── utils/
-├── gui.py
-└── requirements.txt
-```
-
-Não é necessário modificar manualmente o arquivo `config.py`. O sistema:
-- Detecta automaticamente o diretório de instalação
-- Cria o diretório de cache se não existir
-- Inicializa arquivos de dados vazios na primeira execução
-
-## Inicialização do Sistema
-
-### Inicialização Padrão
-
-1. Abra o terminal ou prompt de comando
-2. Navegue até o diretório principal do Compilador Jurídico
-3. Execute o programa com o comando:
-
-**Windows:**
+#### Criação do Ambiente Virtual
 ```bash
-python gui.py
+# Navegue até o diretório do projeto
+cd compilador_juridico
+
+# Crie o ambiente virtual
+python -m venv venv
+
+# Ative o ambiente virtual
+# Windows
+venv\Scripts\activate
+
+# macOS/Linux
+source venv/bin/activate
+
+# Verifique se está ativo (prompt deve mostrar (venv))
+which python
 ```
 
-**macOS/Linux:**
+#### Instalação das Dependências
 ```bash
-python3 gui.py
+# Atualize pip para a versão mais recente
+python -m pip install --upgrade pip
+
+# Instale todas as dependências
+pip install -r requirements.txt
+
+# Verifique se tudo foi instalado corretamente
+pip list
 ```
 
-### Criação de Atalho (Opcional)
+### 4. Verificação da Estrutura
 
-**Windows:**
-1. Clique com o botão direito na área de trabalho
-2. Selecione "Novo > Atalho"
-3. Em "Localização do item", digite:
-   ```
-   pythonw.exe "caminho/completo/para/gui.py"
-   ```
-4. Clique em "Avançar" e dê um nome ao atalho (ex: "Compilador Jurídico")
-5. Clique em "Concluir"
+O sistema criará automaticamente todos os diretórios necessários na primeira execução:
 
-**macOS:**
-1. Abra o TextEdit e crie um novo arquivo
-2. Digite:
+```
+compilador_juridico/
+├── app.py                    # ✅ Aplicação principal Flask
+├── requirements.txt          # ✅ Dependências
+├── src/                      # ✅ Código fonte
+├── templates/                # ✅ Templates HTML
+├── static/                   # ✅ CSS e recursos
+├── assets/cache/             # 🔄 Criado automaticamente
+└── instance/                 # 🔄 Criado automaticamente
+    ├── flask_session/        # 🔄 Sessões Flask
+    └── pdf_output/           # 🔄 PDFs gerados
+```
+
+## 🚀 Configuração e Inicialização
+
+### 1. Configuração de Variáveis de Ambiente (Opcional)
+
+#### Configuração Básica
+```bash
+# Windows (CMD)
+set SECRET_KEY=sua_chave_secreta_muito_longa_e_aleatoria_aqui
+set FLASK_ENV=development
+
+# Windows (PowerShell)
+$env:SECRET_KEY="sua_chave_secreta_muito_longa_e_aleatoria_aqui"
+$env:FLASK_ENV="development"
+
+# macOS/Linux (Bash)
+export SECRET_KEY="sua_chave_secreta_muito_longa_e_aleatoria_aqui"
+export FLASK_ENV="development"
+```
+
+#### Arquivo .env (Opcional)
+Crie um arquivo `.env` na raiz do projeto:
+```env
+SECRET_KEY=sua_chave_secreta_muito_longa_e_aleatoria_aqui
+FLASK_ENV=development
+FLASK_DEBUG=1
+```
+
+### 2. Primeira Execução
+
+```bash
+# Certifique-se de que o ambiente virtual está ativo
+# O prompt deve mostrar (venv)
+
+# Execute a aplicação
+python app.py
+```
+
+**Saída esperada:**
+```
+ * Serving Flask app 'app'
+ * Debug mode: on
+ * Running on http://127.0.0.1:5000
+ * Press CTRL+C to quit
+```
+
+### 3. Acesso ao Sistema
+
+1. Abra seu navegador web
+2. Acesse: `http://localhost:5000` ou `http://127.0.0.1:5000`
+3. A página inicial do Compilador Jurídico deve ser exibida
+
+## ✅ Verificação da Instalação
+
+### 1. Testes de Funcionalidade
+
+#### Teste de Interface
+- [ ] Página inicial carrega sem erros
+- [ ] Menu de navegação funciona
+- [ ] Páginas de cadastro, consulta, estatísticas são acessíveis
+- [ ] Design responsivo funciona (redimensione a janela)
+
+#### Teste de Validação
+1. Acesse `/cadastrar`
+2. Digite um número com menos de 20 dígitos
+3. Verifique se a validação em tempo real funciona
+4. Teste com um número válido (20 dígitos)
+
+#### Teste de Diretórios
+Após a primeira execução, verifique se foram criados:
+```
+instance/
+├── flask_session/           # Sessões do Flask
+└── pdf_output/             # PDFs gerados
+
+assets/cache/
+├── lista_processos_tj.json
+├── lista_processos_trf.json
+├── resultados_processos_tj.json
+└── resultados_processos_trf.json
+```
+
+### 2. Teste de Geração de PDF
+
+1. Acesse `/estadisticas`
+2. Clique em "Gerar PDF Estatísticas"
+3. Verifique se o download inicia automaticamente
+
+### 3. Logs do Sistema
+
+Verifique se os logs estão sendo gerados corretamente:
+```bash
+# Verifique o arquivo de log
+cat instance/app.log
+
+# Ou no Windows
+type instance\app.log
+```
+
+## ⚙️ Configurações Avançadas
+
+### 1. Configuração de Porta Personalizada
+
+```python
+# Edite app.py (final do arquivo)
+if __name__ == '__main__':
+    criar_diretorios()
+    app.run(debug=True, host='0.0.0.0', port=8080)
+```
+
+### 2. Configuração de Memória para PDFs
+
+```python
+# Em src/config.py, ajuste se necessário
+MAX_PDF_AGE_HOURS = 48  # Manter PDFs por 48 horas
+```
+
+### 3. Configuração de Logs
+
+```python
+# Em app.py, ajuste o nível de logging
+logging.basicConfig(level=logging.DEBUG)  # Mais detalhado
+```
+
+### 4. Acesso em Rede Local
+
+Para permitir acesso de outros computadores na rede:
+
+```python
+# app.py (final do arquivo)
+if __name__ == '__main__':
+    criar_diretorios()
+    app.run(debug=True, host='0.0.0.0', port=5000)
+```
+
+Depois acesse via: `http://SEU_IP:5000`
+
+## 🔧 Solução de Problemas
+
+### Problemas Comuns de Instalação
+
+#### Erro: "ModuleNotFoundError: No module named 'flask'"
+```bash
+# Verifique se o ambiente virtual está ativo
+# Instale as dependências novamente
+pip install -r requirements.txt
+```
+
+#### Erro: "Permission denied" ao criar diretórios
+```bash
+# Linux/macOS - Ajuste permissões
+chmod 755 .
+chmod -R 755 assets/
+
+# Windows - Execute como administrador
+```
+
+#### Erro: "Port 5000 is already in use"
+```bash
+# Mude a porta em app.py ou mate o processo
+# Windows
+netstat -ano | findstr :5000
+taskkill /PID [PID_NUMBER] /F
+
+# Linux/macOS
+lsof -i :5000
+kill -9 [PID_NUMBER]
+```
+
+### Problemas de Performance
+
+#### PDFs não estão sendo gerados
+```bash
+# Verifique permissões do diretório
+ls -la instance/pdf_output/
+
+# Teste manual de geração
+python -c "from reportlab.pdfgen import canvas; print('ReportLab OK')"
+```
+
+#### Interface lenta para carregar
+1. Verifique conexão com internet
+2. Desative modo debug em produção
+3. Verifique logs de erro em `instance/app.log`
+
+### Problemas de Conectividade
+
+#### Erro ao consultar APIs
+1. Verifique conexão com internet
+2. Teste conectividade:
    ```bash
-   #!/bin/bash
-   cd /caminho/completo/para/compilador-juridico
-   python3 gui.py
+   ping api-publica.datajud.cnj.jus.br
    ```
-3. Salve o arquivo como "iniciar_compilador.command"
-4. Abra o Terminal e torne o arquivo executável:
-   ```bash
-   chmod +x /caminho/para/iniciar_compilador.command
-   ```
-5. Agora você pode iniciar o programa com um duplo clique no arquivo
+3. Verifique se não há firewall bloqueando
 
-**Linux:**
-1. Crie um arquivo de texto chamado "compilador-juridico.desktop" em ~/.local/share/applications/
-2. Adicione o seguinte conteúdo:
-   ```
-   [Desktop Entry]
-   Type=Application
-   Name=Compilador Jurídico
-   Comment=Sistema de gerenciamento de processos jurídicos
-   Exec=python3 /caminho/completo/para/gui.py
-   Icon=/caminho/para/icone.png
-   Terminal=false
-   Categories=Office;Legal;
-   ```
-3. Torne o arquivo executável:
-   ```bash
-   chmod +x ~/.local/share/applications/compilador-juridico.desktop
-   ```
+#### Sessões perdidas constantemente
+1. Verifique se o diretório `instance/flask_session/` tem permissões de escrita
+2. Defina uma SECRET_KEY fixa
+3. Aumente o tempo de sessão em app.py
 
-## Verificação da Instalação
+### Debug Avançado
 
-Para verificar se a instalação foi concluída com sucesso:
+#### Modo Debug Detalhado
+```bash
+export FLASK_DEBUG=1
+export FLASK_ENV=development
+python app.py
+```
 
-1. Inicie o sistema conforme as instruções acima
-2. A interface gráfica do Compilador Jurídico deve ser exibida sem erros
-3. Na primeira execução, o sistema criará automaticamente:
-   - O diretório `assets/cache`
-   - Arquivos JSON vazios para armazenamento de dados
-4. Verifique a barra de status na parte inferior da janela - deve exibir "Pronto"
+#### Logs Detalhados
+```python
+# Adicione ao início de app.py
+import logging
+logging.basicConfig(level=logging.DEBUG)
+```
 
-### Testes Recomendados
+## 🚀 Deploy em Produção
 
-1. **Verificação de diretórios**: Após a primeira execução, verifique se o diretório `assets/cache` foi criado automaticamente
-2. **Teste de conexão**: Tente consultar um processo existente
-3. **Teste de salvamento**: Adicione um processo de teste à sua lista
-4. **Teste de geração de PDF**: Gere um relatório PDF de estatísticas
+### 1. Configuração para Produção
 
-O sistema é configurado para criar automaticamente todos os arquivos e diretórios necessários na primeira execução, não sendo necessária qualquer configuração manual de caminhos.
+#### Variáveis de Ambiente Seguras
+```bash
+export SECRET_KEY="chave_super_secreta_de_pelo_menos_32_caracteres"
+export FLASK_ENV="production"
+export FLASK_DEBUG="0"
+```
 
-## Solução de Problemas
+#### Arquivo de Configuração Produção
+```python
+# config.py
+import os
 
-### Problemas com Dependências
+class ProductionConfig:
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    DEBUG = False
+    TESTING = False
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    PERMANENT_SESSION_LIFETIME = 1800  # 30 minutos
+```
 
-**Problema**: Erro "No module named X" ao iniciar o programa.
+### 2. Servidor Web Produção
 
-**Solução**:
-1. Verifique se você instalou todas as dependências:
-   ```bash
-   pip list
-   ```
-2. Instale manualmente a biblioteca faltante:
-   ```bash
-   pip install nome_da_biblioteca
-   ```
+#### Gunicorn (Recomendado)
+```bash
+# Instale Gunicorn
+pip install gunicorn
 
-### Problemas com o tkinter
+# Execute em produção
+gunicorn -w 4 -b 0.0.0.0:8000 app:app
+```
 
-**Problema**: "ModuleNotFoundError: No module named 'tkinter'"
+#### uWSGI
+```bash
+# Instale uWSGI
+pip install uwsgi
 
-**Solução**:
-- **Windows/macOS**: Reinstale o Python e certifique-se de selecionar a opção "tcl/tk e IDLE"
-- **Linux**: Instale o pacote python3-tk:
-  ```bash
-  sudo apt install python3-tk
-  ```
+# Crie arquivo uwsgi.ini
+[uwsgi]
+module = app:app
+master = true
+processes = 4
+socket = compilador.sock
+chmod-socket = 666
+vacuum = true
+die-on-term = true
+```
 
-### Erros de Permissão
+### 3. Proxy Reverso (Nginx)
 
-**Problema**: Erros relacionados a permissões de arquivos ao salvar dados.
+```nginx
+server {
+    listen 80;
+    server_name seu-dominio.com;
 
-**Solução**:
-1. Verifique se você tem permissão de escrita no diretório do programa
-2. Execute o programa como administrador (Windows) ou use sudo (Linux/macOS)
-3. Verifique se o diretório `assets/cache` tem permissões de escrita
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
 
-### Erro na Criação de Diretórios
+    location /static {
+        alias /caminho/para/compilador_juridico/static;
+    }
+}
+```
 
-**Problema**: Mensagens de erro indicando falha na criação automática de diretórios ou arquivos.
+### 4. SSL/HTTPS
 
-**Solução**:
-1. Verifique as permissões da pasta onde o sistema está instalado
-2. Mantenha a estrutura de pastas original (não renomeie ou mova pastas)
-3. Crie manualmente o diretório `assets/cache` se necessário
-4. Verifique se há espaço disponível em disco
+```bash
+# Certbot (Let's Encrypt)
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d seu-dominio.com
+```
 
-### Problemas de Interface Gráfica
+## 🔄 Atualizações e Manutenção
 
-**Problema**: A interface gráfica não é exibida corretamente.
+### 1. Atualização do Sistema
 
-**Solução**:
-1. Verifique a versão do Python e atualize se necessário
-2. Reinstale a biblioteca tkinter
-3. Em sistemas Linux, certifique-se de ter um ambiente de desktop instalado
+```bash
+# Backup dos dados
+cp -r assets/cache/ backup_cache_$(date +%Y%m%d)/
 
-## Atualizações
+# Atualize o código
+git pull origin main
 
-### Verificação de Atualizações
+# Atualize dependências
+pip install -r requirements.txt --upgrade
 
-É recomendável verificar periodicamente se há atualizações disponíveis para o Compilador Jurídico. Para atualizar:
+# Reinicie o serviço
+```
 
-1. Baixe a versão mais recente do repositório oficial
-2. Faça backup dos seus arquivos de dados (normalmente na pasta `data`)
-3. Substitua os arquivos antigos pelos novos
-4. Execute o comando de instalação de dependências novamente para garantir que todas estejam atualizadas:
-   ```bash
-   pip install -r requirements.txt --upgrade
-   ```
+### 2. Manutenção Regular
 
-### Migração de Dados
+#### Limpeza de Cache (Automática)
+O sistema limpa automaticamente arquivos antigos a cada requisição.
 
-Se você estiver atualizando de uma versão anterior, pode ser necessário migrar seus dados:
+#### Backup Manual
+```bash
+# Backup completo
+tar -czf backup_compilador_$(date +%Y%m%d).tar.gz assets/ instance/
+```
 
-1. Copie os arquivos da pasta `data` da instalação antiga
-2. Cole-os na pasta `data` da nova instalação
-3. Inicie o programa e verifique se todos os seus dados estão presentes
+#### Monitoramento de Logs
+```bash
+# Acompanhe logs em tempo real
+tail -f instance/app.log
+```
+
+## 📞 Suporte e Recursos
+
+### Documentação
+- **Manual Online**: Acesse `/manual` na aplicação
+- **API DataJud**: [Documentação CNJ](https://datajud.cnj.jus.br)
+- **Flask**: [Documentação Flask](https://flask.palletsprojects.com)
+
+### Comunidade
+- **Issues**: [GitHub Issues](https://github.com/alexfabianomoc/compilador_juridico/issues)
+- **Discussões**: [GitHub Discussions](https://github.com/alexfabianomoc/compilador_juridico/discussions)
+
+### Logs e Debugging
+```bash
+# Verificar logs de erro
+grep ERROR instance/app.log
+
+# Verificar logs de acesso
+grep "GET\|POST" instance/app.log
+
+# Monitorar performance
+grep "slow" instance/app.log
+```
 
 ---
 
-© 2025 Compilador Jurídico. Todos os direitos reservados.
+**🎉 Parabéns!** Seu Compilador Jurídico Web está pronto para uso. A aplicação oferece uma interface moderna e intuitiva para gerenciamento eficiente de processos judiciais.
+
+**💡 Dica**: Marque esta página nos favoritos para referência rápida durante atualizações e manutenção do sistema.

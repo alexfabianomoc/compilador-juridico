@@ -1,0 +1,233 @@
+{% extends "layout.html" %}
+
+{% block title %}Consultar Processos - Compilador Jurídico{% endblock %}
+
+{% block content %}
+<div style="padding: 2rem;">
+    <div class="card-header" style="text-align: center; margin-bottom: 2rem;">
+        <h2 class="card-title" style="font-size: 2.5rem;">
+            🔍 Consultar Processos
+        </h2>
+        <p style="font-size: 1.1rem; opacity: 0.8;">Consulte processos individuais ou em lote através da API DataJud</p>
+    </div>
+
+    <!-- Consulta Individual -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                🔎 Consulta Individual
+            </h3>
+        </div>
+        <form method="POST">
+            <div class="form-group">
+                <label class="form-label" for="numero">Número do Processo (20 dígitos):</label>
+                <input type="text" 
+                       id="numero" 
+                       name="numero" 
+                       class="form-input" 
+                       placeholder="Ex: 12345678901234567890"
+                       maxlength="20"
+                       pattern="[0-9]{20}"
+                       required>
+                <small style="color: #6b7280; font-size: 0.9rem;">Digite exatamente 20 dígitos numéricos</small>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Tipo do Tribunal:</label>
+                <div class="radio-group">
+                    <label class="radio-item">
+                        <input type="radio" name="tipo" value="TJ" checked>
+                        <span>⚖️ TJ (Tribunal de Justiça)</span>
+                    </label>
+                    <label class="radio-item">
+                        <input type="radio" name="tipo" value="TRF">
+                        <span>🏛️ TRF (Tribunal Regional Federal)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button type="submit" class="btn btn-primary">
+                    🔍 Consultar Processo
+                </button>
+                <a href="{{ url_for('gerar_pdf_consulta_individual') }}" 
+                   id="pdfIndividualBtn" 
+                   class="btn btn-secondary" 
+                   style="display: none;">
+                    📄 Gerar PDF da Consulta
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Consulta em Lote -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                📊 Consulta em Lote - Meus Processos
+            </h3>
+        </div>
+        <p style="margin-bottom: 2rem; color: #6b7280;">Consulte todos os processos cadastrados de uma vez só</p>
+        
+        <div class="grid grid-2">
+            <div style="text-align: center; padding: 1.5rem; background: #fef2f2; border-radius: 8px; border: 2px solid #fecaca;">
+                <h4 style="color: #dc2626; margin-bottom: 1rem;">
+                    ⚖️ Processos TJ
+                </h4>
+                <p style="margin-bottom: 1.5rem; font-size: 0.9rem;">Consultar todos os processos do Tribunal de Justiça</p>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <a href="{{ url_for('consultar_todos', tipo='TJ') }}" class="btn btn-primary">
+                        🔍 Consultar Todos TJ
+                    </a>
+                    <a href="{{ url_for('gerar_pdf_consulta_lote', tipo='TJ') }}" 
+                       id="pdfTJBtn" 
+                       class="btn btn-secondary" 
+                       style="display: none;">
+                        📄 Gerar PDF TJ
+                    </a>
+                </div>
+            </div>
+
+            <div style="text-align: center; padding: 1.5rem; background: #fef2f2; border-radius: 8px; border: 2px solid #fecaca;">
+                <h4 style="color: #dc2626; margin-bottom: 1rem;">
+                    🏛️ Processos TRF
+                </h4>
+                <p style="margin-bottom: 1.5rem; font-size: 0.9rem;">Consultar todos os processos do Tribunal Regional Federal</p>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <a href="{{ url_for('consultar_todos', tipo='TRF') }}" class="btn btn-primary">
+                        🔍 Consultar Todos TRF
+                    </a>
+                    <a href="{{ url_for('gerar_pdf_consulta_lote', tipo='TRF') }}" 
+                       id="pdfTRFBtn" 
+                       class="btn btn-secondary" 
+                       style="display: none;">
+                        📄 Gerar PDF TRF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informações sobre Consultas -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                ℹ️ Informações sobre as Consultas
+            </h3>
+        </div>
+        <div class="grid grid-2">
+            <div>
+                <h4 style="color: #dc2626; margin-bottom: 1rem;">Como Funcionam</h4>
+                <ul style="line-height: 1.8; margin-left: 1.5rem;">
+                    <li><strong>API DataJud:</strong> Conexão oficial com os tribunais</li>
+                    <li><strong>Dados Atualizados:</strong> Informações em tempo real</li>
+                    <li><strong>Consulta Segura:</strong> Protocolo HTTPS criptografado</li>
+                    <li><strong>Relatórios PDF:</strong> Documentação profissional</li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="color: #dc2626; margin-bottom: 1rem;">Informações Obtidas</h4>
+                <ul style="line-height: 1.8; margin-left: 1.5rem;">
+                    <li><strong>Dados Básicos:</strong> Tribunal, classe, assunto</li>
+                    <li><strong>Situação Atual:</strong> Status e última atualização</li>
+                    <li><strong>Histórico:</strong> Movimentações principais</li>
+                    <li><strong>Partes:</strong> Quando disponível publicamente</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dicas de Uso -->
+    <div class="card" style="background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%); border: 2px solid #bfdbfe;">
+        <div class="card-header">
+            <h3 class="card-title">
+                💡 Dicas de Uso
+            </h3>
+        </div>
+        <div class="grid grid-2">
+            <div>
+                <h4 style="color: #1d4ed8; margin-bottom: 1rem;">Consulta Individual</h4>
+                <ul style="line-height: 1.8; margin-left: 1.5rem;">
+                    <li>Ideal para verificar processo específico</li>
+                    <li>Resultado detalhado e imediato</li>
+                    <li>Gere PDF para documentação</li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="color: #1d4ed8; margin-bottom: 1rem;">Consulta em Lote</h4>
+                <ul style="line-height: 1.8; margin-left: 1.5rem;">
+                    <li>Consulte todos os processos de uma vez</li>
+                    <li>Economize tempo em verificações rotineiras</li>
+                    <li>Relatório consolidado em PDF</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Pré-popular formulário se vier das estatísticas
+    const numeroProcesso = localStorage.getItem('processo_numero');
+    const tipoProcesso = localStorage.getItem('processo_tipo');
+    
+    if (numeroProcesso && tipoProcesso) {
+        document.getElementById('numero').value = numeroProcesso;
+        document.querySelector(`input[name="tipo"][value="${tipoProcesso}"]`).checked = true;
+        
+        // Limpar localStorage
+        localStorage.removeItem('processo_numero');
+        localStorage.removeItem('processo_tipo');
+        
+        // Atualizar visual dos radio buttons
+        document.querySelectorAll('.radio-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        document.querySelector(`input[name="tipo"][value="${tipoProcesso}"]`).closest('.radio-item').classList.add('active');
+    }
+
+    // Validação em tempo real do número do processo
+    const numeroInput = document.getElementById('numero');
+    numeroInput.addEventListener('input', function() {
+        const valor = this.value.replace(/\D/g, ''); // Remove não-dígitos
+        this.value = valor.slice(0, 20); // Limita a 20 dígitos
+        
+        // Feedback visual
+        if (valor.length === 20) {
+            this.style.borderColor = '#22c55e';
+            this.style.backgroundColor = '#f0fdf4';
+        } else if (valor.length > 0) {
+            this.style.borderColor = '#f59e0b';
+            this.style.backgroundColor = '#fffbeb';
+        } else {
+            this.style.borderColor = '#e5e7eb';
+            this.style.backgroundColor = '#ffffff';
+        }
+    });
+
+    // Mostrar botões de PDF se há resultados na sessão
+    // Isso seria controlado pelo backend, mas podemos simular
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('resultado') || document.cookie.includes('ultimo_resultado')) {
+        document.getElementById('pdfIndividualBtn').style.display = 'inline-flex';
+    }
+    
+    if (document.cookie.includes('ultimo_resultado_lote_TJ')) {
+        document.getElementById('pdfTJBtn').style.display = 'inline-flex';
+    }
+    
+    if (document.cookie.includes('ultimo_resultado_lote_TRF')) {
+        document.getElementById('pdfTRFBtn').style.display = 'inline-flex';
+    }
+
+    // Adicionar loading states para consultas em lote
+    const consultaLinks = document.querySelectorAll('a[href*="consultar_todos"]');
+    consultaLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            this.innerHTML = '<span class="spinner"></span>Consultando...';
+            this.style.pointerEvents = 'none';
+        });
+    });
+});
+</script>
+{% endblock %}

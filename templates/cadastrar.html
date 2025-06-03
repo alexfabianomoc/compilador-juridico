@@ -1,0 +1,292 @@
+{% extends "layout.html" %}
+
+{% block title %}Cadastrar Processos - Compilador Jurídico{% endblock %}
+
+{% block content %}
+<div style="padding: 2rem;">
+    <div class="card-header" style="text-align: center; margin-bottom: 2rem;">
+        <h2 class="card-title" style="font-size: 2.5rem;">
+            📝 Cadastrar Processos
+        </h2>
+        <p style="font-size: 1.1rem; opacity: 0.8;">Adicione processos TJ e TRF à sua lista personalizada</p>
+    </div>
+
+    <!-- Formulário de Cadastro -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                ➕ Adicionar Novo Processo
+            </h3>
+        </div>
+        <form method="POST" id="cadastroForm">
+            <div class="form-group">
+                <label class="form-label" for="numero">Número do Processo (20 dígitos):</label>
+                <input type="text" 
+                       id="numero" 
+                       name="numero" 
+                       class="form-input" 
+                       placeholder="Ex: 12345678901234567890"
+                       maxlength="20"
+                       pattern="[0-9]{20}"
+                       required
+                       {% if request.args.get('numero') %}value="{{ request.args.get('numero') }}"{% endif %}>
+                <small style="color: #6b7280; font-size: 0.9rem;">
+                    Digite exatamente 20 dígitos numéricos conforme padrão CNJ
+                </small>
+                <div id="numeroFeedback" style="margin-top: 0.5rem; font-size: 0.9rem;"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Tipo do Tribunal:</label>
+                <div class="radio-group">
+                    <label class="radio-item">
+                        <input type="radio" name="tipo" value="TJ" 
+                               {% if not request.args.get('tipo') or request.args.get('tipo') == 'TJ' %}checked{% endif %}>
+                        <span>⚖️ TJ - Tribunal de Justiça de Minas Gerais</span>
+                    </label>
+                    <label class="radio-item">
+                        <input type="radio" name="tipo" value="TRF"
+                               {% if request.args.get('tipo') == 'TRF' %}checked{% endif %}>
+                        <span>🏛️ TRF - Tribunal Regional Federal da 6ª Região</span>
+                    </label>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    ➕ Cadastrar Processo
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="limparFormulario()">
+                    🗑️ Limpar Formulário
+                </button>
+                <a href="{{ url_for('consultar') }}" class="btn btn-outline" id="consultarBtn" style="display: none;">
+                    🔍 Consultar Este Processo
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Informações sobre Cadastro -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                ℹ️ Informações sobre Cadastro
+            </h3>
+        </div>
+        <div class="grid grid-2">
+            <div>
+                <h4 style="color: #dc2626; margin-bottom: 1rem;">Como Funciona</h4>
+                <ul style="line-height: 1.8; margin-left: 1.5rem;">
+                    <li><strong>Validação Automática:</strong> O sistema verifica se o número tem 20 dígitos</li>
+                    <li><strong>Prevenção de Duplicatas:</strong> Não permite cadastrar o mesmo processo duas vezes</li>
+                    <li><strong>Organização por Tipo:</strong> Processos TJ e TRF ficam em listas separadas</li>
+                    <li><strong>Persistência Local:</strong> Os dados ficam salvos no seu computador</li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="color: #dc2626; margin-bottom: 1rem;">Formato do Número</h4>
+                <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; border-left: 4px solid #dc2626;">
+                    <p style="margin-bottom: 0.5rem;"><strong>Padrão CNJ:</strong> NNNNNNN-DD.AAAA.J.TR.OOOO</p>
+                    <p style="font-size: 0.9rem; color: #6b7280; margin-bottom: 1rem;">Onde:</p>
+                    <ul style="font-size: 0.9rem; color: #6b7280; line-height: 1.6; margin-left: 1rem;">
+                        <li><strong>N:</strong> Número sequencial</li>
+                        <li><strong>D:</strong> Dígitos verificadores</li>
+                        <li><strong>A:</strong> Ano de propositura</li>
+                        <li><strong>J:</strong> Segmento do Poder Judiciário</li>
+                        <li><strong>T:</strong> Tribunal do respectivo segmento</li>
+                        <li><strong>O:</strong> Código da unidade de origem</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;"><strong>Exemplo:</strong> 12345678901234567890</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dicas de Uso -->
+    <div class="card" style="background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%); border: 2px solid #bfdbfe;">
+        <div class="card-header">
+            <h3 class="card-title">
+                💡 Dicas de Uso
+            </h3>
+        </div>
+        <div class="grid grid-2">
+            <div>
+                <h4 style="color: #1d4ed8; margin-bottom: 1rem;">Organizando Seus Processos</h4>
+                <ul style="line-height: 1.8; margin-left: 1.5rem;">
+                    <li>Cadastre todos os processos que deseja acompanhar</li>
+                    <li>Use consultas em lote para verificar todos de uma vez</li>
+                    <li>Gere relatórios PDF das estatísticas</li>
+                    <li>Mantenha sua lista sempre atualizada</li>
+                </ul>
+            </div>
+            <div>  
+                <h4 style="color: #1d4ed8; margin-bottom: 1rem;">Próximos Passos</h4>
+                <ul style="line-height: 1.8; margin-left: 1.5rem;">
+                    <li>Após cadastrar, vá às <strong>Estatísticas</strong> para visualizar</li>
+                    <li>Use <strong>Consultar</strong> para obter informações atualizadas</li>
+                    <li>Gere <strong>PDFs</strong> para documentação</li>
+                    <li>Consulte o <strong>Manual</strong> se precisar de ajuda</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                ⚡ Ações Rápidas
+            </h3>
+        </div>
+        <div class="hero-buttons">
+            <a href="{{ url_for('estatisticas') }}" class="btn btn-primary">
+                📊 Ver Processos Cadastrados
+            </a>
+            <a href="{{ url_for('consultar') }}" class="btn btn-secondary">
+                🔍 Consultar Processos
+            </a>
+            <a href="{{ url_for('manual') }}" class="btn btn-secondary">
+                📖 Ver Manual
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const numeroInput = document.getElementById('numero');
+    const feedback = document.getElementById('numeroFeedback');
+    const submitBtn = document.getElementById('submitBtn');
+    const consultarBtn = document.getElementById('consultarBtn');
+    const form = document.getElementById('cadastroForm');
+
+    // Validação em tempo real
+    numeroInput.addEventListener('input', function() {
+        const valor = this.value.replace(/\D/g, ''); // Remove não-dígitos
+        this.value = valor.slice(0, 20); // Limita a 20 dígitos
+        
+        // Feedback visual e textual
+        if (valor.length === 0) {
+            this.style.borderColor = '#e5e7eb';
+            this.style.backgroundColor = '#ffffff';
+            feedback.innerHTML = '';
+            submitBtn.disabled = false;
+        } else if (valor.length === 20) {
+            this.style.borderColor = '#22c55e';
+            this.style.backgroundColor = '#f0fdf4';
+            feedback.innerHTML = '<span style="color: #22c55e;">✅ Número válido</span>';
+            submitBtn.disabled = false;
+        } else {
+            this.style.borderColor = '#f59e0b';
+            this.style.backgroundColor = '#fffbeb';
+            feedback.innerHTML = `<span style="color: #f59e0b;">⚠️ Faltam ${20 - valor.length} dígitos</span>`;
+            submitBtn.disabled = false; // Ainda permite envio para mostrar erro do servidor
+        }
+    });
+
+    // Prevenir caracteres não-numéricos
+    numeroInput.addEventListener('keypress', function(e) {
+        const char = String.fromCharCode(e.which);
+        if (!/[0-9]/.test(char)) {
+            e.preventDefault();
+        }
+    });
+
+    // Feedback de sucesso após cadastro
+    form.addEventListener('submit', function() {
+        submitBtn.innerHTML = '<span class="spinner"></span>Cadastrando...';
+        submitBtn.disabled = true;
+    });
+
+    // Mostrar botão de consulta após cadastro bem-sucedido
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+        {% if category == 'success' and numeroInput.value %}
+            setTimeout(() => {
+                consultarBtn.style.display = 'inline-flex';
+                consultarBtn.href = `{{ url_for('consultar') }}?numero=${numeroInput.value}&tipo=${document.querySelector('input[name="tipo"]:checked').value}`;
+            }, 1000);
+        {% endif %}
+    {% endfor %}
+    {% endwith %}
+
+    // Exemplo de processo para demonstração
+    const exemploBtn = document.createElement('button');
+    exemploBtn.type = 'button';
+    exemploBtn.className = 'btn btn-outline';
+    exemploBtn.innerHTML = '📋 Usar Exemplo';
+    exemploBtn.onclick = function() {
+        numeroInput.value = '50000000120244080000';
+        numeroInput.dispatchEvent(new Event('input'));
+        document.querySelector('input[name="tipo"][value="TJ"]').checked = true;
+        document.querySelectorAll('.radio-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        document.querySelector('input[name="tipo"][value="TJ"]').closest('.radio-item').classList.add('active');
+    };
+    
+    // Adicionar botão de exemplo ao formulário
+    document.querySelector('.form-group').appendChild(document.createElement('br'));
+    const exemploDiv = document.createElement('div');
+    exemploDiv.style.marginTop = '1rem';
+    exemploDiv.style.textAlign = 'center';
+    exemploDiv.appendChild(exemploBtn);
+    document.querySelector('.form-group').appendChild(exemploDiv);
+});
+
+function limparFormulario() {
+    document.getElementById('numero').value = '';
+    document.getElementById('numero').style.borderColor = '#e5e7eb';
+    document.getElementById('numero').style.backgroundColor = '#ffffff';
+    document.getElementById('numeroFeedback').innerHTML = '';
+    document.querySelector('input[name="tipo"][value="TJ"]').checked = true;
+    
+    // Atualizar visual dos radio buttons
+    document.querySelectorAll('.radio-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    document.querySelector('input[name="tipo"][value="TJ"]').closest('.radio-item').classList.add('active');
+    
+    document.getElementById('consultarBtn').style.display = 'none';
+}
+
+// Auto-focus no campo de número
+document.getElementById('numero').focus();
+</script>
+
+<style>
+/* Animações específicas para esta página */
+.form-input {
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(220, 38, 38, 0.2);
+}
+
+.radio-item {
+    transition: all 0.3s ease;
+}
+
+.radio-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
+}
+
+#numeroFeedback {
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+/* Efeito de digitação no placeholder */
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+.form-input:focus::placeholder {
+    animation: typing 2s steps(20) infinite;
+}
+</style>
+{% endblock %}

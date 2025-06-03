@@ -1,0 +1,107 @@
+{% extends "layout.html" %}
+
+{% block title %}Compilador Jurídico - Sistema de Gestão de Processos{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="hero-content">
+        <h2>Compilador Jurídico</h2>
+        <p>Sistema completo para gestão e consulta de processos jurídicos do TJ e TRF</p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('cadastrar') }}" class="btn btn-outline">
+                📝 Cadastrar Processos
+            </a>
+            <a href="{{ url_for('consultar') }}" class="btn btn-outline">
+                🔍 Consultar Processos
+            </a>
+            <a href="{{ url_for('estatisticas') }}" class="btn btn-outline">
+                📊 Ver Estatísticas
+            </a>
+        </div>
+    </div>
+</div>
+
+<div style="padding: 2rem;">
+    <div class="grid grid-3">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    📋 Gestão de Processos
+                </h3>
+            </div>
+            <p>Cadastre, organize e gerencie sua lista de processos jurídicos do Tribunal de Justiça (TJ) e Tribunal Regional Federal (TRF) de forma centralizada.</p>
+            <br>
+            <a href="{{ url_for('cadastrar') }}" class="btn btn-primary">Começar Cadastro</a>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    🔍 Consultas Avançadas
+                </h3>
+            </div>
+            <p>Realize consultas individuais ou em lote através da API DataJud, obtendo informações atualizadas sobre a situação dos seus processos.</p>
+            <br>
+            <a href="{{ url_for('consultar') }}" class="btn btn-primary">Fazer Consulta</a>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    📊 Relatórios PDF
+                </h3>
+            </div>
+            <p>Gere relatórios profissionais em PDF com estatísticas dos seus processos e resultados das consultas realizadas.</p>
+            <br>
+            <a href="{{ url_for('estatisticas') }}" class="btn btn-primary">Ver Relatórios</a>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 2rem;">
+        <div class="card-header">
+            <h3 class="card-title">
+                ⚖️ Sobre o Sistema
+            </h3>
+        </div>
+        <div class="grid grid-2">
+            <div>
+                <h4 style="color: #dc2626; margin-bottom: 1rem;">Funcionalidades Principais</h4>
+                <ul style="line-height: 1.8; margin-left: 1.5rem;">
+                    <li><strong>Cadastro de Processos:</strong> Adicione números de processos TJ e TRF à sua lista personalizada</li>
+                    <li><strong>Consultas DataJud:</strong> Acesse informações oficiais dos tribunais em tempo real</li>
+                    <li><strong>Consultas em Lote:</strong> Consulte todos os seus processos de uma só vez</li>
+                    <li><strong>Geração de PDFs:</strong> Crie relatórios profissionais das consultas e estatísticas</li>
+                    <li><strong>Gestão Completa:</strong> Exclua processos individuais ou em lote quando necessário</li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="color: #dc2626; margin-bottom: 1rem;">Informações Técnicas</h4>
+                <ul style="line-height: 1.8; margin-left: 1.5rem;">
+                    <li><strong>Tribunais Suportados:</strong> TJMG (Tribunal de Justiça de MG) e TRF6 (6ª Região)</li>
+                    <li><strong>Validação:</strong> Números de processo com 20 dígitos conforme padrão CNJ</li>
+                    <li><strong>API DataJud:</strong> Integração oficial com os sistemas dos tribunais</li>
+                    <li><strong>Interface Moderna:</strong> Design responsivo e intuitivo</li>
+                    <li><strong>Relatórios:</strong> Exportação em PDF para documentação profissional</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 2rem; text-align: center; background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%); border: 2px solid #fecaca;">
+        <div class="card-header">
+            <h3 class="card-title">
+                🚀 Comece Agora
+            </h3>
+        </div>
+        <p style="font-size: 1.1rem; margin-bottom: 2rem;">Transforme a gestão dos seus processos jurídicos com nossa plataforma completa</p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('cadastrar') }}" class="btn btn-primary">
+                📝 Cadastrar Primeiro Processo
+            </a>
+            <a href="{{ url_for('manual') }}" class="btn btn-secondary">
+                📖 Ver Manual do Usuário
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
